@@ -1,0 +1,1086 @@
+ <!DOCTYPE html>
+ <html lang="pl">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>NOVAX - System Przechowalni</title>
+     <style>
+         :root {
+             --bg-main: #f0f4f8;
+             --bg-card: #ffffff;
+             --bg-input: #f8fafc;
+             --primary-blue: #1e3799;
+             --primary-blue-hover: #0c2461;
+             --accent-btn: #2980b9;
+             --accent-btn-hover: #2471a3;
+             --text-main: #2d3436;
+             --text-muted: #636e72;
+             --border: #b2bec3;
+             --success: #27ae60;
+             --danger: #c0392b;
+         }
+ 
+         * {
+             box-sizing: border-box;
+             margin: 0;
+             padding: 0;
+             font-family: Arial, sans-serif;
+         }
+ 
+         body {
+             background-color: var(--bg-main);
+             color: var(--text-main);
+             padding: 20px;
+         }
+ 
+         .header {
+             background: var(--primary-blue);
+             color: #fff;
+             text-align: center;
+             padding: 20px;
+             border-radius: 10px;
+             margin-bottom: 25px;
+             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+         }
+ 
+         .header h1 {
+             font-size: 28px;
+             margin-bottom: 5px;
+             letter-spacing: 1px;
+         }
+ 
+         .header p {
+             font-size: 13px;
+             opacity: 0.9;
+         }
+ 
+         .top-bar {
+             display: flex;
+             justify-content: space-between;
+             align-items: center;
+             margin-bottom: 20px;
+             flex-wrap: wrap;
+             gap: 15px;
+         }
+ 
+         .search-bar {
+             display: flex;
+             gap: 8px;
+             align-items: center;
+             flex: 1;
+             max-width: 400px;
+         }
+ 
+         .search-bar input {
+             flex: 1;
+             background: #fff;
+             border: 2px solid var(--primary-blue);
+             color: var(--text-main);
+             padding: 10px 14px;
+             border-radius: 8px;
+             font-size: 14px;
+             outline: none;
+         }
+ 
+         .card {
+             background: var(--bg-card);
+             border: 1px solid var(--border);
+             border-radius: 10px;
+             padding: 20px;
+             margin-bottom: 20px;
+             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+         }
+ 
+         .btn {
+             background: var(--accent-btn);
+             color: #fff;
+             border: none;
+             padding: 10px 18px;
+             border-radius: 6px;
+             font-weight: bold;
+             cursor: pointer;
+             transition: 0.2s;
+         }
+ 
+         .btn:hover { background: var(--accent-btn-hover); }
+         .btn-danger { background: var(--danger); color: #fff; }
+         .btn-success { background: var(--success); color: #fff; }
+         .btn-primary { background: var(--primary-blue); color: #fff; }
+         .btn-primary:hover { background: var(--primary-blue-hover); }
+ 
+         .segregator-box {
+             border: 1px solid var(--border);
+             background: #fff;
+             border-radius: 8px;
+             padding: 15px;
+             margin-bottom: 15px;
+             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+         }
+ 
+         .modal-overlay {
+             display: none;
+             position: fixed;
+             top: 0; left: 0; width: 100%; height: 100%;
+             background: rgba(0, 0, 0, 0.7);
+             justify-content: center;
+             align-items: center;
+             z-index: 1000;
+         }
+ 
+         .modal-content-blank {
+             background: #fff;
+             color: #000;
+             padding: 30px;
+             border-radius: 6px;
+             max-width: 850px;
+             width: 95%;
+             max-height: 92vh;
+             overflow-y: auto;
+             font-size: 14px;
+             line-height: 1.4;
+         }
+ 
+         .blank-line {
+             margin-bottom: 8px;
+             display: flex;
+             align-items: center;
+             flex-wrap: wrap;
+             gap: 5px;
+         }
+ 
+         .blank-line input {
+             flex: 1;
+             min-width: 140px;
+             padding: 5px;
+             border: 1px solid #ccc;
+             border-radius: 4px;
+             font-size: 14px;
+         }
+ 
+         .input-error {
+             border: 2px solid #e74c3c !important;
+             background-color: #fdf2e9 !important;
+         }
+ 
+         .error-msg {
+             color: #e74c3c;
+             font-size: 11px;
+             font-weight: bold;
+             display: none;
+             width: 100%;
+             margin-top: 2px;
+         }
+ 
+         .scan-table {
+             width: 100%;
+             border-collapse: collapse;
+             margin-bottom: 8px;
+         }
+         .scan-table td, .scan-table th {
+             border: 1px solid #000;
+             padding: 3px 5px;
+             font-size: 11.5px;
+         }
+ 
+        @media print {
+          @page { size: A4 portrait; margin: 0; }
+          html, body { margin:0 !important; padding:0 !important; background:#fff !important; }
+          body * { visibility:hidden !important; }
+          #printArea, #printArea * { visibility:visible !important; }
+          #printArea { display:block !important; position:absolute; left:0; top:0; width:210mm; }
+          .print-sheet { width:210mm; height:297mm; margin:0; padding:0; page-break-after:always; break-after:page; overflow:hidden; background:#fff; }
+          .print-sheet:last-child { page-break-after:auto; break-after:auto; }
+          .print-sheet svg { display:block; width:210mm; height:297mm; }
+        }
+        .print-sheet { display:block; width:210mm; height:297mm; background:#fff; overflow:hidden; }
+        #printArea .print-sheet { display:block; }
+
+     </style>
+ </head>
+ <body>
+ 
+     <div class="header">
+         <h1>NOVAX</h1>
+         <p>ul. Madziarska 26, 61-615 Poznań | Tel. (061) 822-74-55 | dyrekcja\@novax.poznan.pl</p>
+     </div>
+ 
+     <div id="novaxCloudPanel" class="card" style="padding:12px 16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+         <strong>Chmura NOVAX:</strong>
+         <span id="novaxCloudStatus" style="font-weight:bold; color:#b9770e;">Łączenie z istniejącą chmurą LIONESS…</span>
+         <small style="color:var(--text-muted);">Oddzielna przestrzeń danych: novax_temp</small>
+     </div>
+
+     <div class="top-bar">
+         <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+             <input type="text" id="newSegName" placeholder="Nazwa segregatora (np. ZIMA 2026 / LATO 2027)" style="background: #fff; border: 1px solid var(--border); padding: 10px; border-radius: 8px; width: 300px; outline: none;">
+             <button class="btn btn-success" onclick="addSegregator()">+ Stwórz segregator</button>
+         </div>
+
+         <div class="search-bar">
+             <input type="text" id="globalSearchInput" placeholder="🔍 Szukaj po nr rej, tel, nazwisku..." onkeyup="performSearch()">
+             <button class="btn btn-primary" onclick="performSearch()">Szukaj</button>
+         </div>
+     </div>
+ 
+     <div class="card">
+         <h2 style="color: var(--primary-blue); margin-bottom: 15px; font-size: 20px;">📁 Segregatory przechowalni</h2>
+         <div id="segregatorsList">
+             <p style="color: var(--text-muted); font-size: 14px;">Brak segregatorów. Stwórz pierwszy powyżej.</p>
+         </div>
+     </div>
+ 
+     <!-- МОДАЛЬНЕ ВІКНО ПОШУКУ -->
+     <div id="searchModal" class="modal-overlay">
+         <div class="modal-content-blank" style="max-width: 750px;">
+             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary-blue); padding-bottom: 10px; margin-bottom: 15px;">
+                 <h3 style="color: var(--primary-blue);">Wyniki wyszukiwania</h3>
+                 <button class="btn btn-danger" onclick="closeSearchModal()" style="padding: 4px 10px;">X</button>
+             </div>
+             <div id="searchResultsList" style="max-height: 60vh; overflow-y: auto;"></div>
+         </div>
+     </div>
+ 
+     <!-- МОДАЛЬНЕ ВІКНО: PRZECHOWALNIA PRYWATNA -->
+     <div id="privateModal" class="modal-overlay">
+         <div class="modal-content-blank">
+             <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #000; padding-bottom: 6px; margin-bottom: 10px;">
+                 <div style="font-size: 11.5px; line-height: 1.25;">
+                     <strong>NOVAX – AUTO OGUMIENIE CENTRUM SP.J</strong>
+                     Ul.Madziarska 26, 61-615 Poznań
+                     Tel.(061) 822-74-55 | dyrekcja\@novax.poznan.pl
+                 </div>
+                 <div style="text-align: right; font-size: 12px;">
+                     Poznań, dn. <input type="text" id="p_Date" style="width: 90px;">
+                     <strong style="font-size: 18px;">NR <input type="text" id="p_Nr" inputmode="numeric" autocomplete="off" oninput="validateDocumentNumber('p_Nr', 'p_NrErr')" onblur="validateDocumentNumber('p_Nr', 'p_NrErr')" style="width: 60px; font-size: 16px; font-weight: bold;"></strong><span id="p_NrErr" class="error-msg" style="display:none; text-align:right;">⚠️ Wpisz prawidłowy kolejny numer!</span>
+                 </div>
+             </div>
+ 
+             <div style="text-align: center; font-size: 14px; font-weight: bold; margin: 10px 0;">
+                 MADZIARSKA
+                 Dowód przechowania opon / felg na okres <input type="text" id="p_Season" value="" style="width: 220px; text-align: center; font-size: 13px; font-weight: bold;">
+             </div>
+ 
+             <div class="blank-line">
+                 Imię nazwisko (nazwa) zdającego: <input type="text" id="p_Client" placeholder="Jan Kowalski">
+             </div>
+ 
+             <div class="blank-line">
+                 <div style="flex:1; display:flex; flex-direction:column;">
+                     <div style="display:flex; align-items:center; gap:5px;">
+                         Tel*: <input type="text" id="p_Phone" placeholder="+48 889 123 584" oninput="validatePhone('p_Phone', 'p_PhoneErr')">
+                     </div>
+                     <span id="p_PhoneErr" class="error-msg">⚠️ Wpisz min. 9 cyfr!</span>
+                 </div>
+
+                 <div style="flex:1; display:flex; flex-direction:column;">
+                     <div style="display:flex; align-items:center; gap:5px;">
+                         numer rejestr*: <input type="text" id="p_Plate" placeholder="PO 12345" style="text-transform: uppercase;" oninput="validatePlate('p_Plate', 'p_PlateErr')">
+                     </div>
+                     <span id="p_PlateErr" class="error-msg">⚠️ Wpisz nr rejestracyjny!</span>
+                 </div>
+             </div>
+ 
+             <div class="blank-line">Typ/marka pojazdu: <input type="text" id="p_Model" placeholder="Audi A4"></div>
+             <div class="blank-line">Opony(marka): <input type="text" id="p_Brand" placeholder="Michelin"></div>
+             <div class="blank-line">Typ bieżnika: <input type="text" id="p_Tread" placeholder="Zimowe / Letnie"></div>
+             <div class="blank-line">Rozmiar: <input type="text" id="p_Size" placeholder="205/55 R16"></div>
+             <div class="blank-line">Ilość opon: <input type="number" id="p_Qty" value="4" style="width: 70px;"></div>
+ 
+             <div style="text-align: center; font-size: 11.5px; margin: 8px 0 3px 0;">
+                 <strong>Stopień zużycia opon: / prawy przód / lewy przód / prawy tył / lewy tył / zapas /</strong>
+             </div>
+             <div class="blank-line" style="justify-content: space-around; font-size: 12px;">
+                 <span>głębokość:</span>
+                 <span>PP: <input type="text" id="p_tPP" value="6mm" style="width: 45px;"></span>
+                 <span>LP: <input type="text" id="p_tLP" value="6mm" style="width: 45px;"></span>
+                 <span>PT: <input type="text" id="p_tPT" value="5mm" style="width: 45px;"></span>
+                 <span>LT: <input type="text" id="p_tLT" value="5mm" style="width: 45px;"></span>
+                 <span>Z: <input type="text" id="p_tZ" value="-" style="width: 45px;"></span>
+             </div>
+ 
+             <div class="blank-line">Uwagi (opis): <input type="text" id="p_Notes" placeholder="Stan felg / opon..."></div>
+             <div class="blank-line">Felgi / Stalowe / Alu / <input type="text" id="p_Felgi" placeholder="Stalowe / Alu" style="width: 180px;"></div>
+             <div class="blank-line">Ilość : <input type="text" id="p_FelgiQty" value="4 szt." style="width: 70px;"> Uwagi (opis): <input type="text" id="p_FelgiNotes" placeholder="proste"></div>
+ 
+             <div class="blank-line" style="font-size: 12.5px;">
+                 Zapłaci kwotę: <input type="number" id="p_Price" placeholder="200" style="width: 70px;"> zł brutto (słownie: <input type="text" id="p_PriceText" placeholder="Dwieście złotych">)
+             </div>
+ 
+             <p style="font-size: 10px; line-height: 1.25; color: #000; border: 1px solid #999; padding: 4px; margin-top: 4px;">
+                 <strong>Uwaga : Zwracamy się z uprzejmą prośbą o wcześniejsze powiadomienie nas o chęci wymiany lub odbioru opon/kół.</strong>
+                 Opony/koła nieodebrane do dnia <input type="text" id="p_ExpiryDate" value="30.06.2027" style="width: 80px; text-align:center; font-weight:bold; font-size:10px;"> w okresie trzech miesięcy po tej dacie zostaną bezpłatnie przekazane do utylizacji.
+             </p>
+ 
+             <div style="display: flex; justify-content: space-between; font-size: 11.5px; font-weight: bold; margin-top: 10px;">
+                 <div style="text-align: center;">............................................................Podpis przyjmującego</div>
+                 <div style="text-align: center;">............................................................Podpis składającego</div>
+             </div>
+ 
+             <hr style="margin: 10px 0;">
+             <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                 <button type="button" class="btn btn-success" onclick="saveAndPrintPrivate()">💾 Zapisz i Drukuj (3 egzemplarze)</button>
+                 <button type="button" class="btn btn-danger" onclick="closePrivateModal()">Zamknij</button>
+             </div>
+         </div>
+     </div>
+ 
+     <!-- МОДАЛЬНЕ ВІКНО: PRZECHOWALNIA FLOTY -->
+     <div id="fleetModal" class="modal-overlay">
+         <div class="modal-content-blank">
+             <div style="text-align: center; margin-bottom: 10px;">
+                 <h2 style="font-size: 16px; font-weight: bold; letter-spacing: 1px;">SPECYFIKACJA WYKONANIA ZLECENIA <span style="font-size: 20px;">NR</span> <input type="text" id="f_Nr" inputmode="numeric" autocomplete="off" oninput="validateDocumentNumber('f_Nr', 'f_NrErr')" onblur="validateDocumentNumber('f_Nr', 'f_NrErr')" style="width: 60px; font-size: 16px; font-weight: bold; border: none; border-bottom: 1px dotted #000;"></h2><span id="f_NrErr" class="error-msg" style="display:none;">⚠️ Wpisz prawidłowy kolejny numer!</span>
+                 <div style="font-size: 14px; font-weight: bold; margin-top: 2px;">MADZIARSKA     (061) 822-74-55</div>
+             </div>
+ 
+             <table class="scan-table">
+                 <tr>
+                     <td style="width: 25%;">Data</td>
+                     <td style="width: 75%;" colspan="3"><input type="text" id="f_Date" style="width: 100%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Firma</td>
+                     <td colspan="3"><input type="text" id="f_Firma" style="width: 100%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Autoryzacja :</td>
+                     <td colspan="3"><input type="text" id="f_Autoryzacja" style="width: 100%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Nr rejestracyjny*</td>
+                     <td>
+                         <input type="text" id="f_Plate" style="width: 100%; border: none; text-transform: uppercase;" oninput="validatePlate('f_Plate', 'f_PlateErr')">
+                         <span id="f_PlateErr" class="error-msg">⚠️ Wpisz nr rejestracyjny!</span>
+                     </td>
+                     <td style="width: 15%;">Przebieg</td>
+                     <td style="width: 25%;"><input type="text" id="f_Przebieg" style="width: 100%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Marka auta</td>
+                     <td><input type="text" id="f_AutoModel" style="width: 100%; border: none;"></td>
+                     <td>Felga Stal</td>
+                     <td style="text-align: center;"><input type="checkbox" id="f_FelgaStal"></td>
+                 </tr>
+                 <tr>
+                     <td colspan="2"></td>
+                     <td>Felga Alu</td>
+                     <td style="text-align: center;"><input type="checkbox" id="f_FelgaAlu"></td>
+                 </tr>
+                 <tr>
+                     <td>Imię i nazwisko</td>
+                     <td><input type="text" id="f_Client" style="width: 100%; border: none;"></td>
+                     <td>Tel.*</td>
+                     <td>
+                         <input type="text" id="f_Phone" style="width: 100%; border: none;" oninput="validatePhone('f_Phone', 'f_PhoneErr')">
+                         <span id="f_PhoneErr" class="error-msg">⚠️ Min. 9 cyfr!</span>
+                     </td>
+                 </tr>
+                 <tr>
+                     <td>Miejscowość</td>
+                     <td colspan="3">POZNAŃ</td>
+                 </tr>
+                 <tr>
+                     <td>Oddział Point S</td>
+                     <td colspan="3"><strong>NOVAX MADZIARSKA</strong></td>
+                 </tr>
+             </table>
+ 
+             <div style="text-align: center; font-weight: bold; margin: 6px 0; font-size: 11.5px;">Specyfikacja dokonanych operacji</div>
+ 
+             <table class="scan-table">
+                 <tr>
+                     <td style="width: 25%;">Sprzedane opony</td>
+                     <td style="width: 20%;">Rozmiar: <input type="text" id="f_op_rozm" style="width: 65%; border: none;"></td>
+                     <td style="width: 45%;">Marka: <input type="text" id="f_op_marka" style="width: 70%; border: none;"></td>
+                     <td style="width: 10%;">Ilość: <input type="text" id="f_op_ilosc" style="width: 40%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Zamontowane</td>
+                     <td>Rozmiar: <input type="text" id="f_zam_rozm" style="width: 65%; border: none;"></td>
+                     <td>Marka: <input type="text" id="f_zam_marka" style="width: 70%; border: none;"></td>
+                     <td>Ilość: <input type="text" id="f_zam_ilosc" style="width: 40%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Montaż</td>
+                     <td colspan="3">Ilość: <input type="text" id="f_montaz" style="width: 150px; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Wyważanie</td>
+                     <td colspan="3">Ilość: <input type="text" id="f_wywazanie" style="width: 150px; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Wym. zaworów</td>
+                     <td colspan="3">Ilość: <input type="text" id="f_zawory" style="width: 150px; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Przechowanie</td>
+                     <td>Rozmiar: <input type="text" id="f_przech_rozm" style="width: 65%; border: none;"></td>
+                     <td>Marka: <input type="text" id="f_przech_marka" style="width: 70%; border: none;"></td>
+                     <td>Ilość: <input type="text" id="f_przech_ilosc" style="width: 40%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Utylizacja</td>
+                     <td>Rozmiar: <input type="text" id="f_utyl_rozm" style="width: 65%; border: none;"></td>
+                     <td>Marka: <input type="text" id="f_utyl_marka" style="width: 70%; border: none;"></td>
+                     <td>Ilość: <input type="text" id="f_utyl_ilosc" style="width: 40%; border: none;"></td>
+                 </tr>
+                 <tr>
+                     <td>Naprawa opony/felgi</td>
+                     <td colspan="3">Ilość: <input type="text" id="f_naprawa" style="width: 150px; border: none;"></td>
+                 </tr>
+             </table>
+ 
+             <div style="text-align: center; font-weight: bold; margin: 8px 0 4px 0; font-size: 11.5px;">STAN OPON PRZEZNACZONYCH DO PRZECHOWANIA</div>
+ 
+             <div style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 6px;">
+                 <div style="text-align: right; font-size: 10.5px; line-height: 2;">
+                     <strong>Lewy przód</strong>
+                     <strong>Lewy tył</strong>
+                 </div>
+                 <table class="scan-table" style="width: 120px; margin: 0; text-align: center; font-size: 10.5px;">
+                     <tr><th>Stan</th><th>Głębok.</th></tr>
+                     <tr><td><input type="text" id="f_LP_stan" style="width:100%; border:none; text-align:center;"></td><td><input type="text" id="f_LP_gleb" style="width:100%; border:none; text-align:center;"></td></tr>
+                     <tr><td><input type="text" id="f_LT_stan" style="width:100%; border:none; text-align:center;"></td><td><input type="text" id="f_LT_gleb" style="width:100%; border:none; text-align:center;"></td></tr>
+                 </table>
+                 <div style="font-size: 20px;">⬆️</div>
+                 <table class="scan-table" style="width: 120px; margin: 0; text-align: center; font-size: 10.5px;">
+                     <tr><th>Głębok.</th><th>Stan</th></tr>
+                     <tr><td><input type="text" id="f_PP_gleb" style="width:100%; border:none; text-align:center;"></td><td><input type="text" id="f_PP_stan" style="width:100%; border:none; text-align:center;"></td></tr>
+                     <tr><td><input type="text" id="f_PT_gleb" style="width:100%; border:none; text-align:center;"></td><td><input type="text" id="f_PT_stan" style="width:100%; border:none; text-align:center;"></td></tr>
+                 </table>
+                 <div style="text-align: left; font-size: 10.5px; line-height: 2;">
+                     <strong>Prawy przód</strong>
+                     <strong>Prawy tył</strong>
+                 </div>
+             </div>
+ 
+             <div style="font-size: 10px; margin-bottom: 4px;">Opis stanu opon : 1- b.dobry, 2- dobry, 3- do naprawy, 4- do wymiany</div>
+             <div class="blank-line" style="font-size: 11px;">Opis usterek: <input type="text" id="f_usterek" placeholder="Wpisz uwagi..." style="border:none; border-bottom:1px dotted #000;"></div>
+ 
+             <div style="display: flex; justify-content: space-between; font-size: 11px; font-weight: bold; margin-top: 10px;">
+                 <div style="text-align: center;">Podpis serwisanta</div>
+                 <div style="text-align: center;">Podpis użytkownika</div>
+             </div>
+ 
+             <hr style="margin: 10px 0;">
+             <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                 <button type="button" class="btn btn-success" onclick="saveAndPrintFleet()">💾 Zapisz i Drukuj</button>
+                 <button type="button" class="btn btn-danger" onclick="closeFleetModal()">Zamknij</button>
+             </div>
+         </div>
+     </div>
+ 
+     <div id="printArea" style="display: none;"></div>
+ 
+     <script>
+         let appData = { segregators: [] };
+         let activeSegId = null;
+ 
+         function loadData() {
+             const saved = localStorage.getItem('novax_seg_data_v11');
+             if (saved) { try { appData = JSON.parse(saved); } catch(e){} }
+         }
+ 
+         // ============================================================
+         // NOVAX CLOUD CONNECTION KEY / CONFIG
+         // Tymczasowe połączenie z istniejącą bazą Firebase LIONESS.
+         // NOVAX zapisuje dane wyłącznie w /novax_temp/data.
+         // bookings, services, settings i pozostałe dane LIONESS nie są ruszane.
+         // Przy zmianie chmury w przyszłości wystarczy zmienić te dwa pola.
+         // ============================================================
+         const NOVAX_CLOUD_CONFIG = {
+             databaseURL: 'https://kalendar-f5dd9-default-rtdb.firebaseio.com',
+             dataPath: 'novax_temp/data'
+         };
+         const NOVAX_DEVICE_ID = (() => {
+             let id = localStorage.getItem('novax_device_id_v1');
+             if (!id) { id = 'novax-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9); localStorage.setItem('novax_device_id_v1', id); }
+             return id;
+         })();
+         let novaxCloudReady = false;
+         let novaxCloudSaveTimer = null;
+         let novaxCloudEventSource = null;
+         let novaxCloudUpdatedAt = 0;
+         let novaxApplyingCloud = false;
+
+         function setNovaxCloudStatus(message, color) {
+             const el = document.getElementById('novaxCloudStatus');
+             if (el) { el.textContent = message; el.style.color = color || '#b9770e'; }
+         }
+
+         function novaxCloudUrl() {
+             return NOVAX_CLOUD_CONFIG.databaseURL.replace(/\/$/, '') + '/' + NOVAX_CLOUD_CONFIG.dataPath + '.json';
+         }
+
+         function hasNovaxData(data) {
+             return !!(data && Array.isArray(data.segregators) && data.segregators.length);
+         }
+
+         function mergeNovaxData(localData, cloudData) {
+             const byId = new Map();
+             const all = [...(Array.isArray(cloudData?.segregators) ? cloudData.segregators : []), ...(Array.isArray(localData?.segregators) ? localData.segregators : [])];
+             all.forEach(seg => {
+                 if (!seg || seg.id == null) return;
+                 const old = byId.get(String(seg.id));
+                 if (!old) { byId.set(String(seg.id), JSON.parse(JSON.stringify(seg))); return; }
+                 const chosen = JSON.parse(JSON.stringify(seg));
+                 const records = new Map();
+                 [...(old.records || []), ...(seg.records || [])].forEach(r => { if (r && r.id != null) records.set(String(r.id), r); });
+                 chosen.records = Array.from(records.values()).sort((a,b) => Number(b.id || 0) - Number(a.id || 0));
+                 byId.set(String(seg.id), chosen);
+             });
+             return { segregators: Array.from(byId.values()) };
+         }
+
+         async function novaxCloudWrite() {
+             if (!novaxCloudReady || novaxApplyingCloud) return;
+             const envelope = { data: appData, updatedAt: Date.now(), deviceId: NOVAX_DEVICE_ID };
+             novaxCloudUpdatedAt = envelope.updatedAt;
+             try {
+                 const response = await fetch(novaxCloudUrl(), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(envelope) });
+                 if (!response.ok) throw new Error('HTTP ' + response.status + ' — brak prawa zapisu w Firebase');
+                 setNovaxCloudStatus('Połączono — synchronizacja działa', '#16803c');
+             } catch (err) {
+                 setNovaxCloudStatus('Brak dostępu do chmury: ' + err.message, '#c0392b');
+             }
+         }
+
+         function saveData() {
+             localStorage.setItem('novax_seg_data_v11', JSON.stringify(appData));
+             if (novaxCloudReady && !novaxApplyingCloud) {
+                 clearTimeout(novaxCloudSaveTimer);
+                 novaxCloudSaveTimer = setTimeout(novaxCloudWrite, 350);
+             }
+         }
+
+         function startNovaxCloudListener() {
+             if (novaxCloudEventSource) novaxCloudEventSource.close();
+             novaxCloudEventSource = new EventSource(novaxCloudUrl());
+             novaxCloudEventSource.addEventListener('put', event => {
+                 try {
+                     const payload = JSON.parse(event.data);
+                     const envelope = payload && payload.data;
+                     if (!envelope || !envelope.data || envelope.deviceId === NOVAX_DEVICE_ID) return;
+                     const remoteTime = Number(envelope.updatedAt || 0);
+                     if (remoteTime <= novaxCloudUpdatedAt) return;
+                     novaxCloudUpdatedAt = remoteTime;
+                     novaxApplyingCloud = true;
+                     appData = envelope.data;
+                     localStorage.setItem('novax_seg_data_v11', JSON.stringify(appData));
+                     renderSegregators();
+                     novaxApplyingCloud = false;
+                     setNovaxCloudStatus('Połączono — odebrano zmiany z drugiego urządzenia', '#16803c');
+                 } catch (err) { console.error('NOVAX cloud stream:', err); novaxApplyingCloud = false; }
+             });
+             novaxCloudEventSource.onerror = () => setNovaxCloudStatus('Utracono połączenie na żywo — ponawiam…', '#b9770e');
+             novaxCloudEventSource.onopen = () => setNovaxCloudStatus('Połączono — synchronizacja aktywna', '#16803c');
+         }
+
+         async function connectNovaxCloud() {
+             setNovaxCloudStatus('Łączenie z istniejącą bazą LIONESS…', '#b9770e');
+             try {
+                 const response = await fetch(novaxCloudUrl(), { cache: 'no-store' });
+                 if (!response.ok) throw new Error('HTTP ' + response.status + ' — Firebase blokuje odczyt');
+                 const cloud = await response.json();
+                 const cloudData = cloud && cloud.data ? cloud.data : null;
+                 const localHas = hasNovaxData(appData);
+                 const cloudHas = hasNovaxData(cloudData);
+                 if (cloudHas && localHas) appData = mergeNovaxData(appData, cloudData);
+                 else if (cloudHas) appData = cloudData;
+                 localStorage.setItem('novax_seg_data_v11', JSON.stringify(appData));
+                 novaxCloudUpdatedAt = Number(cloud?.updatedAt || 0);
+                 novaxCloudReady = true;
+                 if (!cloud || !cloud.data || (localHas && cloudHas) || (localHas && !cloudHas)) await novaxCloudWrite();
+                 else setNovaxCloudStatus('Połączono — dane pobrane z chmury', '#16803c');
+                 renderSegregators();
+                 startNovaxCloudListener();
+             } catch (err) {
+                 novaxCloudReady = false;
+                 setNovaxCloudStatus('Nie udało się połączyć: ' + err.message, '#c0392b');
+             }
+         }
+
+         function init() {
+             loadData();
+             renderSegregators();
+             connectNovaxCloud();
+         }
+ 
+         function getCurrentDate() {
+             return new Date().toLocaleDateString('pl-PL');
+         }
+ 
+         function validatePhone(inputId, errId) {
+             const input = document.getElementById(inputId);
+             const err = document.getElementById(errId);
+             const digitsOnly = input.value.replace(/\D/g, '');
+             if (digitsOnly.length < 9) {
+                 input.classList.add('input-error');
+                 if (err) err.style.display = 'block';
+                 return false;
+             } else {
+                 input.classList.remove('input-error');
+                 if (err) err.style.display = 'none';
+                 return true;
+             }
+         }
+ 
+         // Numeracja wynika wyłącznie z aktualnych wpisów w danym segregatorze.
+         // Wyszukujemy najmniejszy wolny numer, więc usunięty numer można użyć ponownie.
+         function getNextAvailableNumber(seg) {
+             if (!seg || !Array.isArray(seg.records)) return 1;
+             const used = new Set();
+             seg.records.forEach(record => {
+                 const match = String(record.nr || '').match(/\d+/);
+                 if (match) {
+                     const n = Number(match[0]);
+                     if (Number.isSafeInteger(n) && n > 0) used.add(n);
+                 }
+             });
+             let candidate = 1;
+             while (used.has(candidate)) candidate++;
+             return candidate;
+         }
+
+         function validateDocumentNumber(inputId, errId) {
+            const input = document.getElementById(inputId);
+            const err = document.getElementById(errId);
+            const seg = appData.segregators.find(s => s.id === activeSegId);
+            if (!input || !seg) return false;
+
+            const expected = String(getNextAvailableNumber(seg));
+            const entered = input.value.trim();
+            const valid = /^\d+$/.test(entered) && entered === expected;
+
+            if (!valid) {
+                input.classList.add('input-error');
+                if (err) {
+                    err.textContent = entered
+                        ? `⚠️ Nieprawidłowy numer! Następny wolny numer to: ${expected}`
+                        : `⚠️ Wpisz numer! Następny wolny numer to: ${expected}`;
+                    err.style.display = 'block';
+                }
+                return false;
+            }
+
+            input.classList.remove('input-error');
+            if (err) err.style.display = 'none';
+            return true;
+        }
+
+        function validatePlate(inputId, errId) {
+             const input = document.getElementById(inputId);
+             const err = document.getElementById(errId);
+             const cleanVal = input.value.trim().replace(/[^a-zA-Z0-9]/g, '');
+             if (cleanVal.length < 4) {
+                 input.classList.add('input-error');
+                 if (err) err.style.display = 'block';
+                 return false;
+             } else {
+                 input.classList.remove('input-error');
+                 if (err) err.style.display = 'none';
+                 return true;
+             }
+         }
+ 
+         function addSegregator() {
+             const input = document.getElementById('newSegName');
+             const name = input.value.trim();
+             if (!name) { alert('Wpisz nazwę segregatora!'); return; }
+             appData.segregators.push({ id: Date.now(), name: name, nextNr: 1, records: [] });
+             saveData();
+             input.value = '';
+             renderSegregators();
+         }
+ 
+         function deleteSegregator(id) {
+             if (confirm('Usunąć ten segregator ze wszystkimi wpisami?')) {
+                 appData.segregators = appData.segregators.filter(s => s.id !== id);
+                 saveData();
+                 renderSegregators();
+             }
+         }
+ 
+         function openPrivateModal(segId) {
+             activeSegId = segId;
+             const seg = appData.segregators.find(s => s.id === segId);
+             if (!seg) return;
+             document.getElementById('p_Date').value = getCurrentDate();
+             document.getElementById('p_Nr').value = '';
+             document.getElementById('p_Nr').classList.remove('input-error');
+             document.getElementById('p_NrErr').style.display = 'none';
+             document.getElementById('p_Season').value = seg.name;
+             document.getElementById('p_Phone').classList.remove('input-error');
+             document.getElementById('p_Plate').classList.remove('input-error');
+             document.getElementById('p_PhoneErr').style.display = 'none';
+             document.getElementById('p_PlateErr').style.display = 'none';
+             document.getElementById('p_Phone').value = '';
+             document.getElementById('p_Plate').value = '';
+             document.getElementById('privateModal').style.display = 'flex';
+         }
+ 
+         function closePrivateModal() { document.getElementById('privateModal').style.display = 'none'; }
+ 
+         function openFleetModal(segId) {
+             activeSegId = segId;
+             const seg = appData.segregators.find(s => s.id === segId);
+             if (!seg) return;
+             document.getElementById('f_Date').value = getCurrentDate();
+             document.getElementById('f_Nr').value = '';
+             document.getElementById('f_Nr').classList.remove('input-error');
+             document.getElementById('f_NrErr').style.display = 'none';
+             document.getElementById('f_Phone').classList.remove('input-error');
+             document.getElementById('f_Plate').classList.remove('input-error');
+             document.getElementById('f_PhoneErr').style.display = 'none';
+             document.getElementById('f_PlateErr').style.display = 'none';
+             document.getElementById('f_Phone').value = '';
+             document.getElementById('f_Plate').value = '';
+             document.getElementById('fleetModal').style.display = 'flex';
+         }
+ 
+         function closeFleetModal() { document.getElementById('fleetModal').style.display = 'none'; }
+ 
+         function saveAndPrintPrivate() {
+             const seg = appData.segregators.find(s => s.id === activeSegId);
+             if (!seg) return;
+             const numberOk = validateDocumentNumber('p_Nr', 'p_NrErr');
+             const phoneOk = validatePhone('p_Phone', 'p_PhoneErr');
+             const plateOk = validatePlate('p_Plate', 'p_PlateErr');
+             if (!numberOk || !phoneOk || !plateOk) {
+                 alert('⚠️ BŁĄD! Wpisz prawidłowy kolejny numer dokumentu, numer telefonu i numer rejestracyjny!');
+                 return;
+             }
+             const nrVal = document.getElementById('p_Nr').value.trim();
+ 
+             const data = {
+                 id: Date.now(), type: 'private', nr: `NR. ${nrVal}`, segName: seg.name, segId: seg.id,
+                 client: document.getElementById('p_Client').value.trim() || 'Klient',
+                 plate: document.getElementById('p_Plate').value.trim().toUpperCase(),
+                 phone: document.getElementById('p_Phone').value.trim(),
+                 details: {
+                     date: document.getElementById('p_Date').value, season: document.getElementById('p_Season').value,
+                     model: document.getElementById('p_Model').value, brand: document.getElementById('p_Brand').value,
+                     tread: document.getElementById('p_Tread').value, size: document.getElementById('p_Size').value,
+                     qty: document.getElementById('p_Qty').value, tPP: document.getElementById('p_tPP').value,
+                     tLP: document.getElementById('p_tLP').value, tPT: document.getElementById('p_tPT').value,
+                     tLT: document.getElementById('p_tLT').value, tZ: document.getElementById('p_tZ').value,
+                     notes: document.getElementById('p_Notes').value, felgi: document.getElementById('p_Felgi').value,
+                     felgiQty: document.getElementById('p_FelgiQty').value, felgiNotes: document.getElementById('p_FelgiNotes').value,
+                     price: document.getElementById('p_Price').value, priceText: document.getElementById('p_PriceText').value,
+                     expiryDate: document.getElementById('p_ExpiryDate').value
+                 }
+             };
+             seg.records.unshift(data);
+             seg.nextNr = getNextAvailableNumber(seg);
+             saveData();
+             closePrivateModal();
+             renderSegregators();
+             printPrivateReceipt(data);
+         }
+ 
+         function saveAndPrintFleet() {
+             const seg = appData.segregators.find(s => s.id === activeSegId);
+             if (!seg) return;
+             const numberOk = validateDocumentNumber('f_Nr', 'f_NrErr');
+             const phoneOk = validatePhone('f_Phone', 'f_PhoneErr');
+             const plateOk = validatePlate('f_Plate', 'f_PlateErr');
+             if (!numberOk || !phoneOk || !plateOk) {
+                 alert('⚠️ BŁĄD! Wpisz prawidłowy kolejny numer dokumentu, numer telefonu i numer rejestracyjny!');
+                 return;
+             }
+             const nrVal = document.getElementById('f_Nr').value.trim();
+ 
+             const data = {
+                 id: Date.now(), type: 'fleet', nr: `NR. ${nrVal}`, segName: seg.name, segId: seg.id,
+                 client: document.getElementById('f_Client').value.trim() || document.getElementById('f_Firma').value.trim() || 'Flota',
+                 plate: document.getElementById('f_Plate').value.trim().toUpperCase(),
+                 phone: document.getElementById('f_Phone').value.trim(),
+                 details: {
+                     date: document.getElementById('f_Date').value, firma: document.getElementById('f_Firma').value,
+                     autoryzacja: document.getElementById('f_Autoryzacja').value, przebieg: document.getElementById('f_Przebieg').value,
+                     autoModel: document.getElementById('f_AutoModel').value, felgaStal: document.getElementById('f_FelgaStal').checked,
+                     felgaAlu: document.getElementById('f_FelgaAlu').checked,
+                     op: { rozm: document.getElementById('f_op_rozm').value, marka: document.getElementById('f_op_marka').value, ilosc: document.getElementById('f_op_ilosc').value },
+                     zam: { rozm: document.getElementById('f_zam_rozm').value, marka: document.getElementById('f_zam_marka').value, ilosc: document.getElementById('f_zam_ilosc').value },
+                     montaz: document.getElementById('f_montaz').value, wywazanie: document.getElementById('f_wywazanie').value,
+                     zawory: document.getElementById('f_zawory').value,
+                     przech: { rozm: document.getElementById('f_przech_rozm').value, marka: document.getElementById('f_przech_marka').value, ilosc: document.getElementById('f_przech_ilosc').value },
+                     utyl: { rozm: document.getElementById('f_utyl_rozm').value, marka: document.getElementById('f_utyl_marka').value, ilosc: document.getElementById('f_utyl_ilosc').value },
+                     naprawa: document.getElementById('f_naprawa').value,
+                     stan: {
+                         LP: { stan: document.getElementById('f_LP_stan').value, gleb: document.getElementById('f_LP_gleb').value },
+                         PP: { stan: document.getElementById('f_PP_stan').value, gleb: document.getElementById('f_PP_gleb').value },
+                         LT: { stan: document.getElementById('f_LT_stan').value, gleb: document.getElementById('f_LT_gleb').value },
+                         PT: { stan: document.getElementById('f_PT_stan').value, gleb: document.getElementById('f_PT_gleb').value }
+                     },
+                     usterek: document.getElementById('f_usterek').value
+                 }
+             };
+             seg.records.unshift(data);
+             seg.nextNr = getNextAvailableNumber(seg);
+             saveData();
+             closeFleetModal();
+             renderSegregators();
+             printFleetReceipt(data);
+         }
+ 
+         function renderSegregators() {
+             const container = document.getElementById('segregatorsList');
+             if (!container) return;
+             if (appData.segregators.length === 0) {
+                 container.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">Brak segregatorów. Stwórz pierwszy powyżej.</p>';
+                 return;
+             }
+             container.innerHTML = '';
+             appData.segregators.forEach(seg => {
+                 let recordsHtml = '';
+                 if (seg.records && seg.records.length > 0) {
+                     seg.records.forEach(item => {
+                         recordsHtml += `
+                             <div style="background: var(--bg-input); padding: 10px; border-radius: 6px; margin-top: 8px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                 <div>
+                                     <span style="background: var(--primary-blue); color: #fff; font-weight: bold; padding: 3px 8px; border-radius: 4px; font-size: 12px;">${item.nr} (${item.type === 'private' ? 'Prywatna' : 'Flota'})</span>
+                                     <strong style="font-size: 14px; margin-left: 6px;">🚗 ${item.plate}</strong> - ${item.client} (${item.phone})
+                                 </div>
+                                 <div style="display: flex; gap: 6px;">
+                                     <button class="btn" style="padding: 4px 10px; font-size: 12px;" onclick="reprint(${seg.id}, ${item.id})">🖨️ Drukuj</button>
+                                     <button class="btn btn-danger" style="padding: 4px 10px; font-size: 12px;" onclick="deleteRecord(${seg.id}, ${item.id})">🗑️</button>
+                                 </div>
+                             </div>
+                         `;
+                     });
+                 } else {
+                     recordsHtml = '<p style="color: var(--text-muted); font-size: 13px; margin-top: 6px;">Brak wpisów w tym segregatorze.</p>';
+                 }
+                 const isCollapsed = seg.collapsed === true;
+                 container.innerHTML += `
+                     <div class="segregator-box">
+                         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: ${isCollapsed ? '0' : '12px'}; border-bottom: ${isCollapsed ? 'none' : '1px solid var(--border)'}; padding-bottom: ${isCollapsed ? '0' : '10px'};">
+                             <h3 style="color: var(--primary-blue); font-size: 18px;">📁 ${seg.name} <small style="font-size: 12px; color: var(--text-muted);">(${seg.records.length} wpisów)</small></h3>
+                             <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                 <button class="btn" style="background: #596579; color: #fff; padding: 6px 12px; font-size: 12px;" onclick="toggleSegregator(${seg.id})">${isCollapsed ? '📂 Otwórz' : '🙈 Ukryj'}</button>
+                                 ${isCollapsed ? '' : `
+                                     <button class="btn btn-primary" style="padding: 6px 12px; font-size: 12px;" onclick="openPrivateModal(${seg.id})">+ Przechowalnia prywatna</button>
+                                     <button class="btn" style="background: #2980b9; color: #fff; padding: 6px 12px; font-size: 12px;" onclick="openFleetModal(${seg.id})">+ Przechowalnia floty</button>
+                                     <button class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="deleteSegregator(${seg.id})">🗑️ Usuń</button>
+                                 `}
+                             </div>
+                         </div>
+                         ${isCollapsed ? '' : `<div>${recordsHtml}</div>`}
+                     </div>
+                 `;
+             });
+         }
+
+         function toggleSegregator(segId) {
+             const seg = appData.segregators.find(item => item.id === segId);
+             if (!seg) return;
+             seg.collapsed = seg.collapsed !== true;
+             saveData();
+             renderSegregators();
+         }
+ 
+         function deleteRecord(segId, recId) {
+             if (confirm('Usunąć ten wpis?')) {
+                 const seg = appData.segregators.find(s => s.id === segId);
+                 if (seg) {
+                     seg.records = seg.records.filter(r => r.id !== recId);
+                     seg.nextNr = getNextAvailableNumber(seg);
+                     saveData();
+                     renderSegregators();
+                 }
+             }
+         }
+ 
+         function reprint(segId, recId) {
+             const seg = appData.segregators.find(s => s.id === segId);
+             if (!seg) return;
+             const item = seg.records.find(r => r.id === recId);
+             if (!item) return;
+             if (item.type === 'private') printPrivateReceipt(item);
+             else printFleetReceipt(item);
+         }
+ 
+         function performSearch() {
+             const query = document.getElementById('globalSearchInput').value.trim().toLowerCase();
+             const modal = document.getElementById('searchModal');
+             const list = document.getElementById('searchResultsList');
+             if (!query) { modal.style.display = 'none'; return; }
+             list.innerHTML = '';
+             let count = 0;
+             appData.segregators.forEach(seg => {
+                 seg.records.forEach(item => {
+                     if (item.plate.toLowerCase().includes(query) || item.client.toLowerCase().includes(query) || item.phone.toLowerCase().includes(query) || item.nr.toLowerCase().includes(query)) {
+                         count++;
+                         list.innerHTML += `
+                             <div style="background: #f8fafc; border: 1px solid var(--border); padding: 10px; border-radius: 6px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;">
+                                 <div>
+                                     <span style="background: var(--primary-blue); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${item.segName} | ${item.nr}</span>
+                                     <h4 style="margin-top: 4px;">🚗 ${item.plate} - ${item.client}</h4>
+                                     <small style="color: var(--text-muted);">Tel: ${item.phone}</small>
+                                 </div>
+                                 <button class="btn btn-primary" style="padding: 5px 10px; font-size: 12px;" onclick="closeSearchModal(); reprint(${item.segId}, ${item.id});">🖨️ Drukuj</button>
+                             </div>
+                         `;
+                     }
+                 });
+             });
+             if (count === 0) list.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 15px;">Nie znaleziono wyników.</p>';
+             modal.style.display = 'flex';
+         }
+ 
+         function closeSearchModal() { document.getElementById('searchModal').style.display = 'none'; }
+ 
+        function xmlSafe(v) {
+            return String(v == null ? '' : v).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]));
+        }
+        function svgText(x,y,value,size=18,weight='normal',anchor='start',family='Arial') {
+            return `<text x="${x}" y="${y}" font-family="${family}" font-size="${size}" font-weight="${weight}" text-anchor="${anchor}" fill="#111">${xmlSafe(value)}</text>`;
+        }
+        function svgLine(x1,y1,x2,y2,width=1,dash='') {
+            return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#222" stroke-width="${width}" stroke-linecap="square" ${dash ? `stroke-dasharray="${dash}"` : ''}/>`;
+        }
+        function svgRect(x,y,w,h,width=1) { return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="#222" stroke-width="${width}"/>`; }
+        function makePrintSheets(svg) {
+            return `<section class="print-sheet">${svg}</section><section class="print-sheet">${svg}</section><section class="print-sheet">${svg}</section>`;
+        }
+        function runPrint(svg) {
+            const printArea = document.getElementById('printArea');
+            printArea.innerHTML = makePrintSheets(svg);
+            printArea.style.display = 'block';
+            setTimeout(() => {
+                window.print();
+                setTimeout(() => { printArea.style.display = 'none'; printArea.innerHTML = ''; }, 800);
+            }, 350);
+        }
+
+        // Cyfrowa rekonstrukcja oryginalnego formularza NOVAX (bez nakładania tekstu na skan).
+        function printPrivateReceipt(item) {
+            const d = item.details || {};
+            let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1046 1450" role="img" aria-label="Dowód przechowania NOVAX"><rect x="0" y="0" width="1046" height="1450" fill="#fff"/>`;
+            s += svgText(163,130,'NOVAX – AUTO OGUMIENIE CENTRUM SP.J',20,'normal','start','Arial');
+            s += svgText(163,158,'Ul.Madziarska 26',20); s += svgText(163,187,'61-615 Poznań',20);
+            s += svgText(163,214,'Tel.(061) 822-74-55',20); s += `<text x="163" y="237" font-family="Arial" font-size="19" fill="#111" text-decoration="underline">dyrekcja@novax.poznan.pl</text>`;
+            s += svgText(623,158,`Poznań, dn. ${d.date || ''}`,20);
+            s += svgText(710,299,`NR ${String(item.nr || '').replace('NR. ','')}`,44,'normal');
+            s += svgLine(780,304,930,304,1.5,'2 4');
+            s += svgText(185,323,'MADZIARSKA',28,'bold');
+            s += svgText(555,376,'Dowód przechowania',22,'bold','middle');
+            s += svgText(550,402,`Opon / felg na okres  ${d.season || ''}`,22,'bold','middle');
+            // Dane klienta — linie i wpisy w tych samych miejscach co w oryginale.
+            s += svgText(163,435,'Imię nazwisko (nazwa)',21); s += svgText(163,460,'zdającego:',21); s += svgText(300,460,d.client || item.client || '',20); s += svgLine(252,468,934,468,1.6,'2 4');
+            s += svgText(163,500,'Tel:',21); s += svgText(205,500,item.phone || '',20); s += svgLine(198,505,490,505,1.5,'2 4');
+            s += svgText(498,500,'numer rejestr:',21); s += svgText(650,500,item.plate || '',20); s += svgLine(650,505,934,505,1.5,'2 4');
+            const rows = [
+              ['Typ/marka pojazdu:',d.model,550],['Opony(marka)',d.brand,590],['Typ bieżnika',d.tread,630],['Rozmiar',d.size,670],['Ilość opon',d.qty,710]
+            ];
+            rows.forEach(([label,val,y])=>{ s+=svgText(163,y,label,21); s+=svgText(label === 'Typ/marka pojazdu:' ? 385 : 355,y, val || '',20); s+=svgLine(330,y+6,934,y+6,1.5,'2 4'); });
+            s += svgLine(160,733,935,733,1.8);
+            // Kolumny zużycia: skrót, opis pozycji, głębokość — osobne równe kolumny.
+            const cx=[442,557,680,786,872];
+            ['PP','LP','PT','LT','Z'].forEach((v,i)=>s+=svgText(cx[i],770,v,20,'bold','middle'));
+            s += svgText(160,800,'Stopień zużycia opon:',20);
+            ['prawy przód','lewy przód','prawy tył','lewy tył','zapas'].forEach((v,i)=>s+=svgText(cx[i],800,v,15,'normal','middle'));
+            s += svgText(160,833,'głębokość:',20);
+            [d.tPP,d.tLP,d.tPT,d.tLT,d.tZ].forEach((v,i)=>s+=svgText(cx[i],837,v || '',19,'normal','middle'));
+            s += svgLine(160,853,935,853,1.6);
+            s += svgText(160,883,'Uwagi (opis):',21); s += svgText(296,883,d.notes || '',19); s += svgLine(296,892,934,892,1.5,'2 4');
+            s += svgLine(160,912,923,912,1.7);
+            s += svgText(160,943,'Felgi / Stalowe / Alu /',21); s += svgText(380,943,d.felgi || '',20); s += svgLine(380,951,923,951,1.5,'2 4');
+            s += svgText(160,985,'Ilość :',21); s += svgText(230,985,d.felgiQty || '',20); s += svgLine(230,993,285,993,1.5,'2 4');
+            s += svgText(297,985,'Uwagi (opis):',21); s += svgText(430,985,d.felgiNotes || '',20); s += svgLine(430,993,923,993,1.5,'2 4');
+            s += svgLine(160,1022,923,1022,1.7);
+            s += svgText(160,1052,'Składający z tytułu przechowania zapłaci za okres przechowania kwotę:',20);
+            s += svgText(160,1080,`${d.price || ''} złotych (brutto) (słownie złotych: ${d.priceText || ''})`,19); s += svgLine(160,1088,923,1088,1.5,'2 4');
+            s += svgText(157,1120,'Uwaga : Zwracamy się z uprzejmą prośbą o wcześniejsze powiadomienie nas o',19,'bold');
+            s += svgText(157,1145,'chęci wymiany lub odbioru opon/kół.',19,'bold');
+            s += svgText(157,1173,`Opony/koła nieodebrane do dnia ${d.expiryDate || ''}, w okresie trzech miesięcy po tej dacie`,18);
+            s += svgText(157,1200,'zostaną bezpłatnie przekazane do utylizacji, bez konieczności powiadomienia',18);
+            s += svgText(157,1227,'właściciela. Podpis składającego pod niniejszym protokołem jest jednocześnie zgodą',18);
+            s += svgText(157,1254,'na utylizację nieodebranych w terminie opon/kół.',18);
+            s += svgLine(157,1318,455,1318,1.6,'2 4'); s += svgLine(605,1318,925,1318,1.6,'2 4');
+            s += svgText(306,1347,'Podpis przyjmującego',19,'bold','middle'); s += svgText(765,1347,'Podpis składającego',19,'bold','middle');
+            s += `</svg>`;
+            runPrint(s);
+        }
+
+        // Cyfrowa rekonstrukcja formularza SPECYFIKACJA WYKONANIA ZLECENIA.
+        function printFleetReceipt(item) {
+            const d = item.details || {}, op=d.op||{}, zam=d.zam||{}, przech=d.przech||{}, utyl=d.utyl||{}, stan=d.stan||{};
+            let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1046 1450" shape-rendering="geometricPrecision" role="img" aria-label="Specyfikacja wykonania zlecenia NOVAX"><rect x="0" y="0" width="1046" height="1450" fill="#fff"/>`;
+            s += svgText(175,182,'SPECYFIKACJA WYKONANIA ZLECENIA',25,'bold','start','Times New Roman');
+            s += svgText(736,182,'NR',54,'bold','start','Times New Roman'); s += svgText(835,182,String(item.nr||'').replace('NR. ',''),22,'normal','start','Times New Roman'); s += svgLine(837,185,945,185,1.4,'2 4');
+            s += svgText(208,231,'MADZIARSKA',34,'bold','start','Times New Roman'); s += svgText(508,231,'(061) 822-74-55',34,'bold','start','Times New Roman');
+            const x0=126,x1=278,x2=497,x3=711,x4=823,x5=900;
+            // Header table geometry follows the supplied scan.
+            const ys=[263,305,346,388,430,472,512,553];
+            s += svgLine(x0,263,497,263,1.4); s += svgLine(x0,263,x0,553,1.4); s += svgLine(900,305,900,553,1.4); s += svgLine(x0,553,900,553,1.4);
+            // Vertical dividers follow the merged cells in the source form.
+            s += svgLine(278,263,278,430,1.2);
+            s += svgLine(278,472,278,553,1.2);
+            s += svgLine(497,263,497,430,1.2);
+            s += svgLine(497,472,497,553,1.2);
+            s += svgLine(711,346,711,430,1.2);
+            s += svgLine(823,346,823,430,1.2);
+            s += svgLine(635,430,635,472,1.2);
+            s += svgLine(681,430,681,472,1.2);
+            [305,346,388,430,472,512].forEach(y=>s+=svgLine(x0,y,900,y,1.2));
+            s += svgLine(497,305,900,305,1.2);
+            s += svgText(180,284,'Data',20,'bold','middle','Times New Roman'); s += svgText(292,284,d.date||'',19,'normal','start','Times New Roman');
+            s += svgText(180,326,'Firma',20,'bold','middle','Times New Roman'); s += svgText(290,326,d.firma||'',19,'normal','start','Times New Roman');
+            s += svgText(510,326,'Autoryzacja :',20,'bold','start','Times New Roman'); s += svgText(650,326,d.autoryzacja||'',19,'normal','start','Times New Roman');
+            s += svgText(133,367,'Nr rejestracyjny',18,'bold','start','Times New Roman'); s += svgText(290,367,item.plate||'',19,'normal','start','Times New Roman');
+            s += svgText(510,367,'Przebieg',20,'bold','start','Times New Roman'); s += svgText(600,367,d.przebieg||'',19,'normal','start','Times New Roman');
+            s += svgText(148,410,'Marka auta',19,'bold','start','Times New Roman'); s += svgText(290,410,d.autoModel||'',19,'normal','start','Times New Roman');
+            s += svgText(720,367,'Felga Stal',19,'bold','start','Times New Roman'); s += svgText(860,367,d.felgaStal?'X':'',19,'bold','middle','Times New Roman');
+            s += svgText(720,410,'Felga Alu',19,'bold','start','Times New Roman'); s += svgText(860,410,d.felgaAlu?'X':'',19,'bold','middle','Times New Roman');
+            s += svgText(133,459,'Imię i nazwisko',19,'bold','start','Times New Roman'); s += svgText(290,459,item.client||'',19,'normal','start','Times New Roman');
+            s += svgText(640,459,'Tel.',19,'bold','start','Times New Roman'); s += svgText(690,459,item.phone||'',19,'normal','start','Times New Roman');
+            s += svgText(133,497,'Miejscowość',19,'bold','start','Times New Roman'); s += svgText(285,497,'POZNAŃ',20,'bold','start','Times New Roman');
+            s += svgText(133,538,'Oddział Point S',18,'bold','start','Times New Roman'); s += svgText(285,538,'NOVAX MADZIARSKA',22,'bold','start','Times New Roman');
+            // Operation table.
+            s += svgText(568,600,'Specyfikacja dokonanych operacji',24,'bold','middle','Times New Roman');
+            const ox=[125,291,378,557,627,922,970,1010], oy=[619,662,704,745,787,828,870,911,953];
+            s += svgRect(125,619,885,334,1.4); oy.slice(1,-1).forEach(y=>s+=svgLine(125,y,1010,y,1.2));
+            [291,378,557,627,922,970].forEach(x=>s+=svgLine(x,619,x,953,1.2));
+            s += svgText(205,649,'Sprzedane opony',19,'normal','middle','Times New Roman'); s += svgText(300,649,'Rozmiar',18,'normal','start','Times New Roman'); s += svgText(564,641,'Marka /',16,'normal','start','Times New Roman'); s += svgText(564,660,'bieżnik',16,'normal','start','Times New Roman'); s += svgText(928,649,'Ilość',17,'normal','start','Times New Roman');
+            s += svgText(205,691,'Zamontowane',19,'normal','middle','Times New Roman'); s += svgText(300,691,'Rozmiar',18,'normal','start','Times New Roman'); s += svgText(564,683,'Marka /',16,'normal','start','Times New Roman'); s += svgText(564,701,'bieżnik',16,'normal','start','Times New Roman'); s += svgText(928,691,'Ilość',17,'normal','start','Times New Roman');
+            s += svgText(205,733,'Montaż',19,'normal','middle','Times New Roman'); s += svgText(300,733,'Ilość',18,'normal','start','Times New Roman');
+            s += svgText(205,775,'Wyważanie',19,'normal','middle','Times New Roman'); s += svgText(300,775,'Ilość',18,'normal','start','Times New Roman');
+            s += svgText(205,816,'Wym. zaworów',19,'normal','middle','Times New Roman'); s += svgText(300,816,'Ilość',18,'normal','start','Times New Roman');
+            s += svgText(205,858,'Przechowanie',19,'normal','middle','Times New Roman'); s += svgText(300,858,'Rozmiar',18,'normal','start','Times New Roman'); s += svgText(564,850,'Marka /',16,'normal','start','Times New Roman'); s += svgText(564,868,'bieżnik',16,'normal','start','Times New Roman'); s += svgText(928,858,'Ilość',17,'normal','start','Times New Roman');
+            s += svgText(205,899,'Utylizacja',19,'normal','middle','Times New Roman'); s += svgText(300,899,'Rozmiar',18,'normal','start','Times New Roman'); s += svgText(564,891,'Marka /',16,'normal','start','Times New Roman'); s += svgText(564,909,'bieżnik',16,'normal','start','Times New Roman'); s += svgText(928,899,'Ilość',17,'normal','start','Times New Roman');
+            s += svgText(205,940,'Naprawa opony/felgi',17,'normal','middle','Times New Roman'); s += svgText(300,940,'Ilość',18,'normal','start','Times New Roman');
+            // Values are placed only in blank cells, never over printed labels.
+            const vals=[[op.rozm,op.marka,op.ilosc],[zam.rozm,zam.marka,zam.ilosc]];
+            vals.forEach((a,i)=>{let y=i?691:649;s+=svgText(385,y,a[0]||'',17,'normal','start','Times New Roman');s+=svgText(635,y,a[1]||'',17,'normal','start','Times New Roman');s+=svgText(985,y,a[2]||'',17,'normal','start','Times New Roman');});
+            s += svgText(390,733,d.montaz||'',18,'normal','start','Times New Roman'); s += svgText(390,775,d.wywazanie||'',18,'normal','start','Times New Roman'); s += svgText(390,816,d.zawory||'',18,'normal','start','Times New Roman');
+            [[przech,858],[utyl,899]].forEach(([a,y])=>{s+=svgText(385,y,a.rozm||'',17,'normal','start','Times New Roman');s+=svgText(635,y,a.marka||'',17,'normal','start','Times New Roman');s+=svgText(985,y,a.ilosc||'',17,'normal','start','Times New Roman');});
+            s += svgText(390,940,d.naprawa||'',18,'normal','start','Times New Roman');
+            s += svgText(562,994,'STAN OPON PRZEZNACZONYCH DO PRZECHOWANIA',22,'bold','middle','Times New Roman');
+            // Wheel condition diagram from source form.
+            s += svgText(360,1036,'Stan',18,'normal','middle','Times New Roman'); s += svgText(445,1036,'Głębok.',18,'normal','middle','Times New Roman');
+            s += svgText(680,1036,'Głębok.',18,'normal','middle','Times New Roman'); s += svgText(775,1036,'Stan',18,'normal','middle','Times New Roman');
+            s += svgText(260,1081,'Lewy przód',19,'normal','middle','Times New Roman'); s += svgText(260,1175,'Lewy tył',19,'normal','middle','Times New Roman');
+            s += svgRect(317,1048,170,147,1.4); s += svgLine(401,1048,401,1195,1.2); s += svgLine(317,1122,487,1122,1.2);
+            s += svgText(875,1081,'Prawy przód',19,'normal','middle','Times New Roman'); s += svgText(875,1175,'Prawy tył',19,'normal','middle','Times New Roman');
+            s += svgRect(633,1048,169,147,1.4); s += svgLine(718,1048,718,1195,1.2); s += svgLine(633,1122,802,1122,1.2);
+            // Direction arrow
+            s += `<path d="M555 1200 L555 1090 L548 1090 L562 1058 L576 1090 L568 1090 L568 1200 Z" fill="none" stroke="#222" stroke-width="2"/>`;
+            const st=stan||{};
+            s += svgText(359,1095,st.LP?.stan||'',18,'normal','middle','Times New Roman'); s += svgText(445,1095,st.LP?.gleb||'',18,'normal','middle','Times New Roman');
+            s += svgText(359,1170,st.LT?.stan||'',18,'normal','middle','Times New Roman'); s += svgText(445,1170,st.LT?.gleb||'',18,'normal','middle','Times New Roman');
+            s += svgText(675,1095,st.PP?.gleb||'',18,'normal','middle','Times New Roman'); s += svgText(760,1095,st.PP?.stan||'',18,'normal','middle','Times New Roman');
+            s += svgText(675,1170,st.PT?.gleb||'',18,'normal','middle','Times New Roman'); s += svgText(760,1170,st.PT?.stan||'',18,'normal','middle','Times New Roman');
+            s += svgText(173,1228,'Opis stanu opon :1- b.dobry,2- dobry,3- do naprawy,4- do wymiany',19,'normal','start','Times New Roman');
+            s += svgText(173,1278,'Opis usterek:',19,'bold','start','Times New Roman'); s += svgText(290,1278,d.usterek||'',18,'normal','start','Times New Roman'); s += svgLine(290,1283,950,1283,1.3,'2 4');
+            s += svgText(285,1330,'Podpis serwisanta',20,'bold','middle','Times New Roman'); s += svgText(748,1330,'Podpis użytkownika',20,'bold','middle','Times New Roman');
+            s += `</svg>`;
+            runPrint(s);
+        }
+
+        window.addEventListener('online', () => { if (!novaxCloudReady) connectNovaxCloud(); else novaxCloudWrite(); });
+        window.addEventListener('offline', () => setNovaxCloudStatus('Brak internetu — zmiany zapisują się lokalnie', '#c0392b'));
+        window.onload = init;
+     </script>
+ </body>
+ </html>
